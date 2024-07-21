@@ -21,14 +21,14 @@ environments as well provided that your system has all the dependencies supporte
 
 ## Usage
 
-You can clean using
+You can clean using:
 
 
 ```bash
 make clean
 ```
 
-Afterwards, build using
+Afterwards, build using:
 
 
 ```bash
@@ -43,14 +43,14 @@ in a file named 'workload.txt'. It then reads this file and issues read/write re
 ```
 
 This generates a workload of 7500 operations with 60% reads where the bufferpool size is 150 pages and disk size is 1500 pages. 
-The workload is skewed (90% operations are on 10% data). The parameter 'a' shall determine the eviction policy (LRU/LRU-WSR).
+The workload is skewed (90% operations are on 10% data). The parameter 'a' shall determine the eviction policy (LRU/CFLRU/SIEVE).
 Currently, in the program all the parameters default value is set. So, running only ./buffermanager will generate a default workload.
 You can view the default values by running the following command
 
 ```bash
 ./buffermanager -h
 ```
-In this template, we have the following parameters. However, you can/should add parameters as you dig deeper into the implementation.
+In this code, we have the following parameters. However, you can/should add parameters as you dig deeper into the implementation.
 ```bash
 int buffer_size_in_pages;	// b
 int disk_size_in_pages;   	// n
@@ -61,6 +61,7 @@ float skewed_perct;      	// s
 float skewed_data_perct; 	// d
 int algorithm;         		// a
 int verbosity;         		// v
+int window_size;          // i 
 bool pin_mode;   		// enable pin_mode by adding "--pin_mode"
 bool simulation_on_disk;        // enable simulation on disk by adding "--simulation_on_dsik"
 ```
@@ -73,5 +74,5 @@ Your job is to implement them and implement three eviction policies.
 
 ## Contact
 
-If you have any questions please feel free to see Papon in office hours, or
-email him at papon@bu.edu.
+If you have any questions please feel free to see Prisha in office hours, or
+email her at prishashah001@gmail.com. 

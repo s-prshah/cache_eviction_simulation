@@ -40,7 +40,7 @@ namespace bufmanager {
     static int buffer_miss;
     static int read_io;
     static int write_io;
-    
+
     static int time_stamp_num;  
     static int buffer_capacity; 
     static int buffer_hand; // added for the SIEVE algorithm 
@@ -54,7 +54,6 @@ namespace bufmanager {
     int CFLRU(Page page, bool type);
     int SIEVE(Page page);
 
-    int min_index(std::vector<Page> time_list); 
     int id_to_index(std::vector<Page> buffer, int pageId); 
     void replace_contents(int start, std::string to_replace, Page r_page); 
     std::string read_contents(int start, Page r_page); 

@@ -89,21 +89,6 @@ std::string Buffer::read_contents(int start, Page r_page)
   return to_return; 
 }
 
-int Buffer::min_index(std::vector<Page> buffer) {
-  // find a way to optimize this later 
-  long int min_num = buffer[0].time_stamp; 
-  int min_index = 0; 
-  for(auto i = buffer.begin(); i != buffer.end(); ++i) {
-    int index = i - buffer.begin(); 
-    if(buffer[index].time_stamp < min_num) {
-      min_num = buffer[index].time_stamp; 
-      min_index = index; 
-    }
-  }
-  // shift buffer vector instead of deleting 
-  return min_index; 
-}
-
 int Buffer::id_to_index(std::vector<Page> buffer, int pageId) {
   for(auto i = buffer.begin(); i != buffer.end(); ++i) {
     int index = i - buffer.begin(); 
@@ -155,14 +140,13 @@ int WorkloadExecutor::read(Buffer* buffer_instance, int pageId, int offset, int 
     buffer_instance->time_stamp_num += 1; 
     std:: string to_read = buffer_instance->read_contents((offset * 128), buffer_instance->bufferpool[id]);
 
-    // additional steps for if the algorithm is CFLRU
-    if(algorithm == 1) {
+    // additional steps for if the algorithm is LRU or CFLRU 
+    if(algorithm == 0 || algorithm == 1) {
       // shift vector
       Page t_page = buffer_instance->bufferpool[id]; 
       buffer_instance->bufferpool.erase(buffer_instance->bufferpool.begin() + id); 
       buffer_instance->bufferpool.push_back(t_page); 
     }
-
     // additional steps for if the algorithm is SIEVE
     if(algorithm == 2) {
       buffer_instance->bufferpool[id].visited = true; 
@@ -209,8 +193,8 @@ int WorkloadExecutor::write(Buffer* buffer_instance, int pageId, int offset, con
     buffer_instance->replace_contents((offset*128), new_entry, buffer_instance->bufferpool[id]); 
     buffer_instance->bufferpool[id].is_dirty = true; 
 
-    // additional steps for if the algorithm is CFLRU
-    if(algorithm == 1) {
+    // additional steps for if the algorithm is LRU or CFLRU
+    if(algorithm == 0 || algorithm == 1) {
       Page t_page = buffer_instance->bufferpool[id]; 
       buffer_instance->bufferpool.erase(buffer_instance->bufferpool.begin() + id); 
       buffer_instance->bufferpool.push_back(t_page); 
@@ -255,34 +239,27 @@ int WorkloadExecutor::write(Buffer* buffer_instance, int pageId, int offset, con
 
 int Buffer::LRU(Page page)
 {
-  // change to cyclic buffer 
-  int index = 0;
-
   // remove current page from referenced pages 
-
   // update the time stamp for the page (for tracking LRU)
   page.time_stamp = buffer_instance->time_stamp_num; 
   std::cout<<"Time Stamp is: "<<page.time_stamp<<endl;
   std::cout << "buffer_instance->bufferpool.size() = " << buffer_instance->bufferpool.size() << std::endl;
   if(buffer_instance->bufferpool.size() >= buffer_instance->buffer_capacity) {
     // remove least recently used page from the bufferpool 
-    int m_index = buffer_instance->min_index(buffer_instance->bufferpool); 
-    buffer_instance->bufferpool[m_index] = page; 
+    buffer_instance->bufferpool.erase(buffer_instance->bufferpool.begin());
   }
-  else {
-    buffer_instance->bufferpool.push_back(page); 
-  }
+  buffer_instance->bufferpool.push_back(page); 
   // update ongoing highest time stamp 
   buffer_instance->time_stamp_num += 1; 
   std::cout << "The overall running time stamp is now " << buffer_instance->time_stamp_num << std::endl;
-
-  return index; //change what this returns to the index at which the algorithm got replaced at first 
+  return -1; //change what this returns to the index at which the algorithm got replaced at first 
 };
 
+
+// CFLRU isn't working the way it should because in general, the larger the window size of the clean-first region,
+// the smaller the miss rate is (theoretically, it should be the opposite)
 int Buffer::CFLRU(Page page, bool type)
 {
-  int index = 0;
-
   // remove current page from referenced pages 
   // update the time stamp for the page (for tracking LRU)
   page.time_stamp = buffer_instance->time_stamp_num; 
@@ -304,13 +281,11 @@ int Buffer::CFLRU(Page page, bool type)
 
   buffer_instance->time_stamp_num++; 
   std::cout<<"The time stamp has been updated to "<<buffer_instance->time_stamp_num<<" through the CFLRU policy."<<std::endl; 
-  return index; //change what this returns to the index at which the algorithm got replaced at first 
+  return -1; //change what this returns to the index at which the algorithm got replaced at first 
 }
 
 int Buffer::SIEVE(Page page)
 {
-  int index = 0; 
-  // Implement SIEVE
   page.time_stamp = buffer_instance->time_stamp_num; 
   std::cout<<"Time stamp for this page: "<<page.time_stamp<<std::endl; 
   std::cout<<"Bufferpool size = "<<buffer_instance->bufferpool.size()<<std::endl; 
@@ -338,7 +313,7 @@ int Buffer::SIEVE(Page page)
   buffer_instance->time_stamp_num += 1; 
   std::cout<<"Sieve algorithm is updating the overall time stamp; it is now "<<buffer_instance->time_stamp_num<<std::endl; 
   
-  return index; // change this to whatever the SIEVE algorithm should actually return 
+  return -1; // change this to whatever the SIEVE algorithm should actually return 
 }
 
 
