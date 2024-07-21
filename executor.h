@@ -63,6 +63,7 @@ namespace bufmanager {
     static int printStats();
     
     std::vector<Page> bufferpool = {}; 
+    
   };
 
   class Disk {

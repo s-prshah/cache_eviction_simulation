@@ -72,7 +72,7 @@ Currently this implementation has no bufferpool and no way to simulate read/writ
 Your job is to implement them and implement three eviction policies.
 
 
-## Contact
+## Contact 
 
 If you have any questions please feel free to see Prisha in office hours, or
 email her at prishashah001@gmail.com. 

@@ -258,7 +258,7 @@ int Buffer::LRU(Page page)
 
 // CFLRU isn't working the way it should because in general, the larger the window size of the clean-first region,
 // the smaller the miss rate is (theoretically, it should be the opposite)
-int Buffer::CFLRU(Page page, bool type)
+int Buffer::CFLRU(Page page, bool type) 
 {
   // remove current page from referenced pages 
   // update the time stamp for the page (for tracking LRU)
