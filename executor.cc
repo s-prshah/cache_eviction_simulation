@@ -114,8 +114,8 @@ int Buffer::find_cf(std::vector<Page> buffer, int window) {
 
 int WorkloadExecutor::search(Buffer* buffer_instance, int pageId)
 {
-  std::cout << "Searching for page " << pageId << std::endl;
-  std::cout << "Current buffer size: " << buffer_instance->bufferpool.size() << std::endl;
+  //std::cout << "Searching for page " << pageId << std::endl;
+  //std::cout << "Current buffer size: " << buffer_instance->bufferpool.size() << std::endl;
   // Implement Search in the Bufferpool
   for(auto p = buffer_instance->bufferpool.begin(); p != buffer_instance->bufferpool.end(); ++p){
     int p_index = p - buffer_instance->bufferpool.begin(); 
@@ -128,13 +128,13 @@ int WorkloadExecutor::search(Buffer* buffer_instance, int pageId)
 int WorkloadExecutor::read(Buffer* buffer_instance, int pageId, int offset, int algorithm)
 {
   // Implement Read in the Bufferpool
-  std::cout << "Reading pageid " << pageId << std::endl; 
+  //std::cout << "Reading pageid " << pageId << std::endl; 
   int id = search(buffer_instance, pageId);
 
-  std::cout<<"The algorithm is "<<algorithm<<std::endl; 
+  //std::cout<<"The algorithm is "<<algorithm<<std::endl; 
 
   if (id > -1) {
-    std::cout<<"Buffer hit has occured in the read method."<<std::endl; 
+    //std::cout<<"Buffer hit has occured in the read method."<<std::endl; 
     buffer_instance->buffer_hit += 1;
     buffer_instance->bufferpool[id].time_stamp = buffer_instance->time_stamp_num; 
     buffer_instance->time_stamp_num += 1; 
@@ -181,11 +181,11 @@ int WorkloadExecutor::read(Buffer* buffer_instance, int pageId, int offset, int 
 
 int WorkloadExecutor::write(Buffer* buffer_instance, int pageId, int offset, const string new_entry, int algorithm)
 {
-  std::cout << "Writing pageid " << pageId << std::endl;
+  //std::cout << "Writing pageid " << pageId << std::endl;
   // Implement Read in the Bufferpool
   int id = search(buffer_instance, pageId);
   if (id > -1) {
-    std::cout<<"Buffer hit has occured in the write method."<<std::endl; 
+    //std::cout<<"Buffer hit has occured in the write method."<<std::endl; 
     buffer_instance->buffer_hit += 1; 
     buffer_instance->bufferpool[id].time_stamp = buffer_instance->time_stamp_num; 
     buffer_instance->time_stamp_num += 1; 
@@ -208,9 +208,9 @@ int WorkloadExecutor::write(Buffer* buffer_instance, int pageId, int offset, con
   }
   buffer_instance->buffer_miss += 1; 
   buffer_instance->write_io += 1; 
-  std::cout<<"The buffer miss is now: " << buffer_instance->buffer_miss << ", and the write_io is now: " << buffer_instance->write_io <<std::endl; 
+  //std::cout<<"The buffer miss is now: " << buffer_instance->buffer_miss << ", and the write_io is now: " << buffer_instance->write_io <<std::endl; 
   Page cur_page = buffer_instance->fetch_page(pageId); 
-  std::cout<<"***Page Contents: "<<endl<< "is_dirty: "<< cur_page.is_dirty<<endl<<"id: "<<cur_page._page_id<<endl<<"time stamp: "<<cur_page.time_stamp<<"***"<<endl; 
+  //std::cout<<"***Page Contents: "<<endl<< "is_dirty: "<< cur_page.is_dirty<<endl<<"id: "<<cur_page._page_id<<endl<<"time stamp: "<<cur_page.time_stamp<<"***"<<endl; 
   
   switch(algorithm) 
   {
@@ -242,8 +242,8 @@ int Buffer::LRU(Page page)
   // remove current page from referenced pages 
   // update the time stamp for the page (for tracking LRU)
   page.time_stamp = buffer_instance->time_stamp_num; 
-  std::cout<<"Time Stamp is: "<<page.time_stamp<<endl;
-  std::cout << "buffer_instance->bufferpool.size() = " << buffer_instance->bufferpool.size() << std::endl;
+  //std::cout<<"Time Stamp is: "<<page.time_stamp<<endl;
+  //std::cout << "buffer_instance->bufferpool.size() = " << buffer_instance->bufferpool.size() << std::endl;
   if(buffer_instance->bufferpool.size() >= buffer_instance->buffer_capacity) {
     // remove least recently used page from the bufferpool 
     buffer_instance->bufferpool.erase(buffer_instance->bufferpool.begin());
@@ -251,7 +251,7 @@ int Buffer::LRU(Page page)
   buffer_instance->bufferpool.push_back(page); 
   // update ongoing highest time stamp 
   buffer_instance->time_stamp_num += 1; 
-  std::cout << "The overall running time stamp is now " << buffer_instance->time_stamp_num << std::endl;
+  //std::cout << "The overall running time stamp is now " << buffer_instance->time_stamp_num << std::endl;
   return -1; //change what this returns to the index at which the algorithm got replaced at first 
 };
 
@@ -263,10 +263,10 @@ int Buffer::CFLRU(Page page, bool type)
   // remove current page from referenced pages 
   // update the time stamp for the page (for tracking LRU)
   page.time_stamp = buffer_instance->time_stamp_num; 
-  std::cout<<"Time stamp for this page: "<<page.time_stamp<<std::endl; 
-  std::cout<<"Bufferpool size: "<<buffer_instance->bufferpool.size()<<std::endl; 
+  //std::cout<<"Time stamp for this page: "<<page.time_stamp<<std::endl; 
+  //std::cout<<"Bufferpool size: "<<buffer_instance->bufferpool.size()<<std::endl; 
   buffer_instance->cf_pointer = ((buffer_instance->bufferpool.size()) / (buffer_instance->cf_portion)); 
-  std::cout<<"Window size: "<<buffer_instance->cf_pointer<<endl; 
+  //std::cout<<"Window size: "<<buffer_instance->cf_pointer<<endl; 
 
   if(buffer_instance->bufferpool.size() < buffer_instance->buffer_capacity) {
     // unsure about this 
@@ -280,15 +280,15 @@ int Buffer::CFLRU(Page page, bool type)
   }
 
   buffer_instance->time_stamp_num++; 
-  std::cout<<"The time stamp has been updated to "<<buffer_instance->time_stamp_num<<" through the CFLRU policy."<<std::endl; 
+  //std::cout<<"The time stamp has been updated to "<<buffer_instance->time_stamp_num<<" through the CFLRU policy."<<std::endl; 
   return -1; //change what this returns to the index at which the algorithm got replaced at first 
 }
 
 int Buffer::SIEVE(Page page)
 {
   page.time_stamp = buffer_instance->time_stamp_num; 
-  std::cout<<"Time stamp for this page: "<<page.time_stamp<<std::endl; 
-  std::cout<<"Bufferpool size = "<<buffer_instance->bufferpool.size()<<std::endl; 
+  //std::cout<<"Time stamp for this page: "<<page.time_stamp<<std::endl; 
+  //std::cout<<"Bufferpool size = "<<buffer_instance->bufferpool.size()<<std::endl; 
   // remove the current page from the array of referenced/requested pages
 
   if(buffer_instance->bufferpool.size() < buffer_instance->buffer_capacity) {
@@ -311,7 +311,7 @@ int Buffer::SIEVE(Page page)
   }
 
   buffer_instance->time_stamp_num += 1; 
-  std::cout<<"Sieve algorithm is updating the overall time stamp; it is now "<<buffer_instance->time_stamp_num<<std::endl; 
+  //std::cout<<"Sieve algorithm is updating the overall time stamp; it is now "<<buffer_instance->time_stamp_num<<std::endl; 
   
   return -1; // change this to whatever the SIEVE algorithm should actually return 
 }
