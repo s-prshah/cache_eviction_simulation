@@ -22,6 +22,8 @@ int Buffer::buffer_hit = 0;
 int Buffer::buffer_miss = 0;
 int Buffer::read_io = 0;
 int Buffer::write_io = 0;
+int Buffer::read_perc = 0; 
+int Buffer::write_perc = 0; 
 
 int Buffer::time_stamp_num = 0; 
 int Buffer::buffer_capacity = 0; 
@@ -45,6 +47,8 @@ Buffer::Buffer(Simulation_Environment *_env)
   std::vector<Page> bufferpool = {};
   this->buffer_capacity = _env->buffer_size_in_pages;
   this->cf_portion = _env->window_size; 
+  this->read_perc = _env->perct_reads; 
+  this->write_perc = _env->perct_writes; 
 }
 
 //creates a pointer called buffer of the buffer class -> inside, there is a function called "getBufferInstance"
@@ -128,7 +132,7 @@ int WorkloadExecutor::search(Buffer* buffer_instance, int pageId)
 int WorkloadExecutor::read(Buffer* buffer_instance, int pageId, int offset, int algorithm)
 {
   // Implement Read in the Bufferpool
-  //std::cout << "Reading pageid " << pageId << std::endl; 
+  // std::cout << "Reading pageid " << pageId << std::endl; 
   int id = search(buffer_instance, pageId);
 
   //std::cout<<"The algorithm is "<<algorithm<<std::endl; 
@@ -316,7 +320,6 @@ int Buffer::SIEVE(Page page)
   return -1; // change this to whatever the SIEVE algorithm should actually return 
 }
 
-
 int Buffer::printBuffer()
 {
   return -1;
@@ -330,6 +333,9 @@ int Buffer::printStats()
   cout << "Number of operations: " << _env->num_operations << endl;
   cout << "Buffer Hit: " << buffer_hit << endl;
   cout << "Buffer Miss: " << buffer_miss << endl;
+  cout << "Buffer Size: " << buffer_capacity << endl; 
+  cout << "Read Percentage: " << read_perc << endl; 
+  cout << "Write Percentage: " << write_perc << endl; 
   cout << "Read IO: " << read_io << endl;
   cout << "Write IO: " << write_io << endl;  
   cout << "Global Clock: " << endl;

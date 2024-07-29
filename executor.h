@@ -43,6 +43,8 @@ namespace bufmanager {
 
     static int time_stamp_num;  
     static int buffer_capacity; 
+    static int read_perc; 
+    static int write_perc; 
     static int buffer_hand; // added for the SIEVE algorithm 
     static int sifting_count; // added for the SIEVE algorithm 
     static int cf_pointer; // added for the CFLRU algorithm 

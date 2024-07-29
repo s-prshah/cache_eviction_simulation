@@ -71,13 +71,13 @@ int runWorkload(Simulation_Environment* _env) {
     {
         case 'R':
 	        workload_file >> offset;
-          std::cout << "Operation is READ pageId=" << pageId << std::endl;
+          //std::cout << "Operation is READ pageId=" << pageId << std::endl;
           workload_executer.read(buffer_instance, pageId, offset, _env->algorithm);
           break;
 
         case 'W':
 	        workload_file >> offset >> tmp_new_entry;
-          std::cout << "Operation is WRITE pageId=" << pageId << std::endl;
+          //std::cout << "Operation is WRITE pageId=" << pageId << std::endl;
           workload_executer.write(buffer_instance, pageId, offset, tmp_new_entry, _env->algorithm);
 	        tmp_new_entry.clear();
           break;
@@ -150,7 +150,8 @@ int parse_arguments(int argc,char *argvx[], Simulation_Environment* _env) {
 
   std::cout << "VERBOSITY LEVEL IS " << _env->verbosity << std::endl;
   std::cout << "WINDOW SIZE IS " << _env->window_size << std::endl; 
-  
+  std::cout << "ALGORITHM: " << _env->algorithm << std::endl;
+
   return 0;
 }
 
