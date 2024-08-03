@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <chrono>
 
 using namespace std;
 
@@ -49,6 +50,7 @@ namespace bufmanager {
     static int sifting_count; // added for the SIEVE algorithm 
     static int cf_pointer; // added for the CFLRU algorithm 
     static int cf_portion; // added for the CFLRU algorithm 
+    static double total_duration; // global time
 
 
     Page fetch_page(int page_id); 

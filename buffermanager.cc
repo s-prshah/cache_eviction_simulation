@@ -103,7 +103,7 @@ int parse_arguments(int argc,char *argvx[], Simulation_Environment* _env) {
   args::ValueFlag<int> num_operations_cmd(group1, "x", "Total number of operations to be performed [def: 10000]", {'x', "num_operations"});
   args::ValueFlag<int> perct_reads_cmd(group1, "r", "Percentage of read in workload [def: 70.0%]", {'r', "perct_reads"});
   args::ValueFlag<int> verbosity_cmd(group1, "v", "The verbosity level of execution [0,1,2; def:0]", {'v', "verbosity"});
-  args::ValueFlag<int> window_size_cmd(group1, "i", "Portion of the Buffer that is the clean-first region [0 - 6; def: 3]", {'i', "window_size"}); // prisha added this
+  args::ValueFlag<int> window_size_cmd(group1, "i", "Portion of the Buffer that is the clean-first region [0 - 6; def: 3]", {'i', "window_size"}); 
   args::ValueFlag<int> algorithm_cmd(group1, "a", "Algorithm of page eviction []", {'a', "algorithm"});
   args::ValueFlag<int> skewed_perct_cmd(group1, "s", "Skewed distribution of operation on data [s% r/w on d% data, def: 100]", {'s', "skewed_perct"});
   args::ValueFlag<int> skewed_data_perct_cmd(group1, "d", "Skewed distribution of operation on data [s% r/w on d% data, def: 100]", {'d', "skewed_data_perct"});
@@ -134,10 +134,10 @@ int parse_arguments(int argc,char *argvx[], Simulation_Environment* _env) {
       return 1;
   }
 
-  _env->buffer_size_in_pages = buffer_size_in_pages_cmd ? args::get(buffer_size_in_pages_cmd) : 100;
+  _env->buffer_size_in_pages = buffer_size_in_pages_cmd ? args::get(buffer_size_in_pages_cmd) : 4000;
   _env->disk_size_in_pages = disk_size_in_pages_cmd ? args::get(disk_size_in_pages_cmd) : 10000;
-  _env->entry_size = disk_size_in_pages_cmd ? args::get(entry_size_in_bytes_cmd) : 128;
-  _env->num_operations = num_operations_cmd ? args::get(num_operations_cmd) : 10000;
+  _env->entry_size = entry_size_in_bytes_cmd ? args::get(entry_size_in_bytes_cmd) : 128; 
+  _env->num_operations = num_operations_cmd ? args::get(num_operations_cmd) : 1000000;
   _env->perct_reads = perct_reads_cmd ? args::get(perct_reads_cmd) : 70.0;
   _env->perct_writes = 100.0 - _env->perct_reads;
   _env->verbosity = verbosity_cmd ? args::get(verbosity_cmd) : 0;

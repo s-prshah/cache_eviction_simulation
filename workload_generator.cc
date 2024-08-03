@@ -56,7 +56,6 @@ int WorkloadGenerator::generateWorkload() {
     // with specified number of pages using fixed-length entries
     fill_raw_data(_env->disk_size_in_pages, _env->entry_size);
   }
-
   int pageId;
   int endPageId = _env->disk_size_in_pages*(_env->skewed_data_perct/100);
   int entries_per_page = PAGE_SIZE/_env->entry_size;
@@ -65,7 +64,6 @@ int WorkloadGenerator::generateWorkload() {
   //cout << "Printing Workload..." << endl;
   for (long i = 0; i < _env->num_operations; i++) {
     //srand(time(0));
-
     int typeDecider = rand() % 100;  
     int skewed = rand() % 100;
 

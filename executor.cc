@@ -8,10 +8,12 @@
 #include <fstream>
 #include <map> 
 #include <cstring> 
+#include <chrono>
 
 #include "parameter.h"
 #include "executor.h"
 #include "workload_generator.h"
+
 
 using namespace std;
 using namespace bufmanager;
@@ -31,6 +33,7 @@ int Buffer::buffer_hand = 0; // added for the SIEVE algorithm
 int Buffer::sifting_count = 0; // added for the SIEVE algorithm 
 int Buffer::cf_pointer = -1; // added for the CFLRU algorithm; is inclusive (i.e, if it's 6, 6 is included in the index)
 int Buffer::cf_portion = -1; // added for the CFLRU algorithm 
+double Buffer::total_duration = 0; // added for Global Time
 
 // create a workload object
 Page::Page(int page_id, std::string contents)
@@ -134,9 +137,9 @@ int WorkloadExecutor::read(Buffer* buffer_instance, int pageId, int offset, int 
   // Implement Read in the Bufferpool
   // std::cout << "Reading pageid " << pageId << std::endl; 
   int id = search(buffer_instance, pageId);
-
   //std::cout<<"The algorithm is "<<algorithm<<std::endl; 
 
+  // if the page is present in the bufferpool already 
   if (id > -1) {
     //std::cout<<"Buffer hit has occured in the read method."<<std::endl; 
     buffer_instance->buffer_hit += 1;
@@ -160,23 +163,38 @@ int WorkloadExecutor::read(Buffer* buffer_instance, int pageId, int offset, int 
   
   buffer_instance->buffer_miss += 1; 
   buffer_instance->read_io += 1; 
+  
+  // fetching the page from the Disc rather than the bufferpool 
   Page cur_page = buffer_instance->fetch_page(pageId); 
 
   switch(algorithm) 
   {
     case 0:
+      // auto start = std::chrono::high_resolution_clock::now();
       buffer_instance->LRU(cur_page); 
+      // auto end = std::chrono::high_resolution_clock::now();
+      // std::chrono::duration<double> duration = end - start;
+      // buffer_instance->total_duration += duration.count(); 
       break; 
     case 1:
       // false means that this is a read function 
+      // auto start = std::chrono::high_resolution_clock::now();
       buffer_instance->CFLRU(cur_page, false); 
+      // auto end = std::chrono::high_resolution_clock::now();
+      // std::chrono::duration<double> duration = end - start;
+      // buffer_instance->total_duration += duration.count(); 
       break; 
     case 2: 
+      // auto start = std::chrono::high_resolution_clock::now();
       buffer_instance->SIEVE(cur_page); 
+      // auto end = std::chrono::high_resolution_clock::now();
+      // std::chrono::duration<double> duration = end - start;
+      // buffer_instance->total_duration += duration.count(); 
       break; 
     default:
       std::cout<<"The algorithm is not applicable."<<std::endl; 
   }
+  
 
   std:: string to_read = buffer_instance->read_contents((offset * 128), cur_page); 
   return -1;
@@ -243,6 +261,7 @@ int WorkloadExecutor::write(Buffer* buffer_instance, int pageId, int offset, con
 
 int Buffer::LRU(Page page)
 {
+  auto start = std::chrono::high_resolution_clock::now();
   // remove current page from referenced pages 
   // update the time stamp for the page (for tracking LRU)
   page.time_stamp = buffer_instance->time_stamp_num; 
@@ -256,6 +275,9 @@ int Buffer::LRU(Page page)
   // update ongoing highest time stamp 
   buffer_instance->time_stamp_num += 1; 
   //std::cout << "The overall running time stamp is now " << buffer_instance->time_stamp_num << std::endl;
+  auto end = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> duration = end - start;
+  buffer_instance->total_duration += duration.count(); 
   return -1; //change what this returns to the index at which the algorithm got replaced at first 
 };
 
@@ -264,6 +286,7 @@ int Buffer::LRU(Page page)
 // the smaller the miss rate is (theoretically, it should be the opposite)
 int Buffer::CFLRU(Page page, bool type) 
 {
+  auto start = std::chrono::high_resolution_clock::now();
   // remove current page from referenced pages 
   // update the time stamp for the page (for tracking LRU)
   page.time_stamp = buffer_instance->time_stamp_num; 
@@ -273,7 +296,6 @@ int Buffer::CFLRU(Page page, bool type)
   //std::cout<<"Window size: "<<buffer_instance->cf_pointer<<endl; 
 
   if(buffer_instance->bufferpool.size() < buffer_instance->buffer_capacity) {
-    // unsure about this 
     buffer_instance->bufferpool.push_back(page); 
   }
   else {
@@ -285,23 +307,28 @@ int Buffer::CFLRU(Page page, bool type)
 
   buffer_instance->time_stamp_num++; 
   //std::cout<<"The time stamp has been updated to "<<buffer_instance->time_stamp_num<<" through the CFLRU policy."<<std::endl; 
+  auto end = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> duration = end - start;
+  buffer_instance->total_duration += duration.count(); 
   return -1; //change what this returns to the index at which the algorithm got replaced at first 
 }
 
 int Buffer::SIEVE(Page page)
 {
+  auto start = std::chrono::high_resolution_clock::now();
   page.time_stamp = buffer_instance->time_stamp_num; 
   //std::cout<<"Time stamp for this page: "<<page.time_stamp<<std::endl; 
   //std::cout<<"Bufferpool size = "<<buffer_instance->bufferpool.size()<<std::endl; 
-  // remove the current page from the array of referenced/requested pages
 
   if(buffer_instance->bufferpool.size() < buffer_instance->buffer_capacity) {
+    // when the bufferpool is not full yet, you don't do anything with the hand, and you're just adding a new page
     buffer_instance->bufferpool.push_back(page); 
   }
-  else {
-    // remove the current page from the list referenced/requested pages 
+  else { 
+    // evict a page 
     while(buffer_instance->bufferpool[buffer_instance->buffer_hand].visited == true) {
       buffer_instance->bufferpool[buffer_instance->buffer_hand].visited = false; 
+      // start new sifting cycle if hand has reached the head of the bufferpool 
       if((buffer_instance->buffer_hand + 1) == buffer_instance->buffer_capacity) {
         buffer_instance->buffer_hand = 0; 
         buffer_instance->sifting_count++; 
@@ -310,13 +337,17 @@ int Buffer::SIEVE(Page page)
         buffer_instance->buffer_hand++; 
       }
     }
+    // evict the page the hand landed on 
     buffer_instance->bufferpool.erase((buffer_instance->bufferpool.begin() + buffer_instance->buffer_hand)); 
+    // add new page to the head of the bufferpool 
     buffer_instance->bufferpool.push_back(page); 
   }
 
   buffer_instance->time_stamp_num += 1; 
   //std::cout<<"Sieve algorithm is updating the overall time stamp; it is now "<<buffer_instance->time_stamp_num<<std::endl; 
-  
+  auto end = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> duration = end - start;
+  buffer_instance->total_duration += duration.count(); 
   return -1; // change this to whatever the SIEVE algorithm should actually return 
 }
 
@@ -338,7 +369,7 @@ int Buffer::printStats()
   cout << "Write Percentage: " << write_perc << endl; 
   cout << "Read IO: " << read_io << endl;
   cout << "Write IO: " << write_io << endl;  
-  cout << "Global Clock: " << endl;
+  cout << "Global Clock: " << total_duration << endl;
   cout << "******************************************************" << endl;
   return 0;
 }
