@@ -62,7 +62,7 @@ float skewed_perct;      	// s
 float skewed_data_perct; 	// d
 int algorithm;         		// a
 int verbosity;         		// v
-int window_size;            // i 
+int window_size;               // i 
 bool pin_mode;   		    // enable pin_mode by adding "--pin_mode"
 bool simulation_on_disk;    // enable simulation on disk by adding "--simulation_on_dsik"
 ```
