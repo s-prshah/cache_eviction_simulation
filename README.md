@@ -3,10 +3,11 @@
 
 ## About
 
-TemplateBufferpool is a simple template for the students of CS 561. It can be used for the systems projects where the student need
-to implement a simple buffermanage of a DBMS. Note that this is a simple template, it is
-not extensive, rather it is meant to help guide you on what we expect when
-you implement the bufferpool. You can use this as base code or start from scratch.
+This cache eviction simulation explores the implementation of several modern and classic eviction policies including LRU, CFLRU, and SIEVE.
+SIEVE is a new, recently discovered policy (2023) that prioritizes simplicity by building on LRU with the goal of executing with a higher 
+comparative hit-rate. This project explores the implementation of SIEVE in C++ in the executor file, and then builds an emulator in python to 
+make repeated calls to the buffermanager and build csv data files which compare the performance metrics of each eviction policy. The base-line template for this project was extracted from Boston University's
+CS 561 Data Systems Architecture TemplateBufferpool. 
 
 
 ## Requirements
@@ -50,29 +51,28 @@ You can view the default values by running the following command
 ```bash
 ./buffermanager -h
 ```
-In this code, we have the following parameters. However, you can/should add parameters as you dig deeper into the implementation.
+In this code, we have the following parameters. However, you can/should add parameters if you choose to build on this project/explore new policies. 
 ```bash
 int buffer_size_in_pages;	// b
 int disk_size_in_pages;   	// n
 int num_operations;    		// x
-int entry_size;                 // e
+int entry_size;             // e
 int perct_reads;       		// r
 float skewed_perct;      	// s
 float skewed_data_perct; 	// d
 int algorithm;         		// a
 int verbosity;         		// v
-int window_size;          // i 
-bool pin_mode;   		// enable pin_mode by adding "--pin_mode"
-bool simulation_on_disk;        // enable simulation on disk by adding "--simulation_on_dsik"
+int window_size;            // i 
+bool pin_mode;   		    // enable pin_mode by adding "--pin_mode"
+bool simulation_on_disk;    // enable simulation on disk by adding "--simulation_on_dsik"
 ```
 With simulation on disk, we will generate a raw database file named by "rawdata_database.dat", fulfilled by specified number of pages.
 Every read operation should read the specific page, go to the corresponding offset according to the workload, find out the whole entry
 as required. Similarly, every write option should update the corresponding entry with the new entry.
-Currently this implementation has no bufferpool and no way to simulate read/writes. 
-Your job is to implement them and implement three eviction policies.
+Currently this implementation has a bufferpool, a simulation of read/writes, three implemented eviction policies, and compilers 
+for comparing different metrics based on changes in parameters. 
 
 
 ## Contact 
 
-If you have any questions please feel free to see Prisha in office hours, or
-email her at prishashah001@gmail.com. 
+If you have any questions please feel free to contact Prisha Shah through her email at prishashah001@gmail.com. 
