@@ -64,7 +64,7 @@ int algorithm;         		// a
 int verbosity;         		// v
 int window_size;                // i 
 bool pin_mode;   		// enable pin_mode by adding "--pin_mode"
-bool simulation_on_disk;      // enable simulation on disk by adding "--simulation_on_dsik"
+bool simulation_on_disk;        // enable simulation on disk by adding "--simulation_on_dsik"
 ```
 With simulation on disk, we will generate a raw database file named by "rawdata_database.dat", fulfilled by specified number of pages.
 Every read operation should read the specific page, go to the corresponding offset according to the workload, find out the whole entry
