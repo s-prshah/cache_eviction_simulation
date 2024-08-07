@@ -56,15 +56,15 @@ In this code, we have the following parameters. However, you can/should add para
 int buffer_size_in_pages;	// b
 int disk_size_in_pages;   	// n
 int num_operations;    		// x
-int entry_size;             // e
+int entry_size;                 // e
 int perct_reads;       		// r
 float skewed_perct;      	// s
 float skewed_data_perct; 	// d
 int algorithm;         		// a
 int verbosity;         		// v
-int window_size;               // i 
-bool pin_mode;   		    // enable pin_mode by adding "--pin_mode"
-bool simulation_on_disk;    // enable simulation on disk by adding "--simulation_on_dsik"
+int window_size;                // i 
+bool pin_mode;   		// enable pin_mode by adding "--pin_mode"
+bool simulation_on_disk;      // enable simulation on disk by adding "--simulation_on_dsik"
 ```
 With simulation on disk, we will generate a raw database file named by "rawdata_database.dat", fulfilled by specified number of pages.
 Every read operation should read the specific page, go to the corresponding offset according to the workload, find out the whole entry
